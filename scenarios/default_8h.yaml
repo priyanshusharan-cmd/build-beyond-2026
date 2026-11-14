@@ -1,0 +1,31 @@
+name: default_8h
+ticks: 480
+nominal_supply: 100.0
+needs:
+  hospital: 38.0
+  water: 24.0
+  telecom: 14.0
+  emergency: 16.0
+max_draw:
+  hospital: 46.0
+  water: 29.0
+  telecom: 17.0
+  emergency: 20.0
+supply_walk:
+  sigma: 1.5
+  min: 60.0
+  max: 110.0
+  mean_revert: 0.05
+shocks:
+  - tick: 90
+    duration: 45
+    delta_mw: -30.0
+    label: "Substation fault"
+  - tick: 240
+    duration: 60
+    delta_mw: -25.0
+    label: "Storm line damage"
+  - tick: 380
+    duration: 30
+    delta_mw: -35.0
+    label: "Cascading grid trip"
