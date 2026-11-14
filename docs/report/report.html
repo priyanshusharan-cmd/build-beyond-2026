@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blackout Arena — Review 2 Briefing</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 14mm 15mm 14mm; }
+  :root { --ink:#1F2733; --ink2:#4B5563; --ink3:#7A8494; --line:#E3E7EE; --soft:#F4F6FA; --pri:#2F5A8A;
+    --h:#D64B68; --w:#2B7FC4; --t:#7552C8; --e:#198F6A; --terra:#C4622D; --green:#1D7F5D; --red:#C62F3B; }
+  * { box-sizing: border-box; }
+  body { font: 400 10pt/1.5 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ink); margin: 0; }
+  h1 { font-size: 30pt; line-height: 1.05; letter-spacing: -0.025em; margin: 0 0 8px; font-weight: 800; }
+  h2 { font-size: 17pt; letter-spacing: -0.015em; line-height: 1.2; margin: 0 0 4px; font-weight: 800; }
+  h3 { font-size: 12pt; margin: 18px 0 6px; font-weight: 700; letter-spacing: -0.005em; }
+  p { margin: 0 0 9px; }
+  .kicker { font-size: 8.5pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--pri); margin-bottom: 6px; }
+  .lead { font-size: 12pt; color: var(--ink2); line-height: 1.5; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .sub { color: var(--ink3); font-size: 9.5pt; margin-bottom: 16px; }
+  .box { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin: 10px 0; break-inside: avoid; }
+  .box.blue { background: #EAF1FA; border-color: #CFDDF0; }
+  .box.warn { background: #FCF1E8; border-color: #F2D6C2; }
+  .box.green { background: #E6F5EE; border-color: #C5E6D6; }
+  .box b.t { display: block; margin-bottom: 4px; }
+  ul { margin: 4px 0 10px; padding-left: 18px; } li { margin: 3px 0; }
+  .grid2 figure img { height: 64mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 12px; break-inside: avoid; }
+  .card .ico { font-size: 18pt; line-height: 1; margin-bottom: 4px; }
+  .card b { display: block; font-size: 11pt; }
+  .card small { color: var(--ink2); font-size: 9pt; line-height: 1.4; display: block; }
+  figure { margin: 10px 0 14px; break-inside: avoid; }
+  figure img { width: 100%; max-height: 118mm; object-fit: cover; object-position: top; border: 1px solid var(--line); border-radius: 10px; display: block; }
+  figcaption { font-size: 9pt; color: var(--ink2); margin-top: 6px; line-height: 1.45; }
+  figcaption b { color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 8px 0 12px; break-inside: avoid; }
+  th { text-align: left; font-weight: 700; color: var(--ink2); border-bottom: 1.5px solid var(--ink); padding: 6px 8px; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .04em; }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.ours td { background: #EEF3FA; font-weight: 600; }
+  .best { color: var(--green); font-weight: 700; }
+  .tag { display: inline-block; font-size: 8pt; font-weight: 700; padding: 1px 7px; border-radius: 99px; }
+  .tag.done { background: #DDF2E8; color: var(--green); } .tag.next { background: #FCEFD6; color: #A2650B; }
+  .q { font-weight: 700; margin-top: 10px; } .a { color: var(--ink2); margin-bottom: 6px; }
+  .cover { height: 255mm; display: flex; flex-direction: column; }
+  .cover-art { flex: 1; border-radius: 18px; overflow: hidden; margin: 22px 0 18px; background: linear-gradient(180deg,#E9EFF8,#D6E3F4); position: relative; }
+  .cover-art img { position: absolute; left: 6%; right: 6%; bottom: -6%; width: 88%; border-radius: 12px 12px 0 0; box-shadow: 0 20px 50px -20px rgba(20,40,80,.45); }
+  .meta { display: flex; gap: 28px; font-size: 9.5pt; color: var(--ink2); }
+  .meta b { display: block; color: var(--ink); font-size: 10.5pt; }
+  .step { display: flex; gap: 10px; margin: 7px 0; break-inside: avoid; }
+  .step .num { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--pri); color: #fff; font-weight: 700; font-size: 9.5pt; display: grid; place-items: center; }
+  code { font-family: Consolas, monospace; font-size: 9pt; background: var(--soft); padding: 1px 5px; border-radius: 4px; }
+  pre { font-family: Consolas, monospace; font-size: 8.8pt; background: #1F2733; color: #E7ECF3; padding: 10px 12px; border-radius: 8px; margin: 6px 0 10px; white-space: pre-wrap; }
+  .diagram { width: 100%; break-inside: avoid; margin: 8px 0; }
+  .say { border-left: 3px solid var(--terra); padding: 4px 0 4px 12px; margin: 8px 0; font-style: italic; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div class="kicker">Build Beyond '26 · BMSCE · PS 1.1 · Review 2 briefing</div>
+  <h1>Blackout Arena</h1>
+  <p class="lead">Four city utilities share a shrinking supply of emergency power during an 8-hour disaster.
+  Instead of a central boss deciding, each utility is an <b>autonomous agent that negotiates</b>.
+  A referee makes sure the grid is never overloaded, and a live dashboard shows it all.</p>
+  <div class="cover-art"><img src="img/live_light.png" alt="Blackout Arena dashboard"></div>
+  <div class="meta">
+    <div><b>Team ScaredToCompile</b>Priyanshu Sharan (lead) · Abdul Khadar D Jamadar</div>
+    <div><b>Status</b>Phase 1 + Phase 2 done, Phase 3 next</div>
+    <div><b>Date</b>14 Nov 2026</div>
+  </div>
+</section>
+
+<!-- ============ 60 SECONDS ============ -->
+<section class="page">
+  <div class="kicker">Read this first</div>
+  <h2>The project in 60 seconds</h2>
+  <p class="sub">If you only read one page before the meeting, read this one.</p>
+
+  <div class="box blue"><b class="t">The problem (PS 1.1)</b>
+  A disaster knocks out part of the power grid. There is roughly 100 MW available, it keeps going up and down,
+  and four critical services need about 92 MW together. When supply drops (say to 66 MW), <b>who gets cut?</b>
+  The PS asks for one autonomous agent per utility that negotiates in real time, never breaks capacity limits,
+  balances priority with fairness, and minimises total damage over the whole disaster.</div>
+
+  <div class="box green"><b class="t">What we built</b>
+  <ul>
+    <li><b>A simulation engine</b> (Python): 4 agents — Hospital, Water, Telecom, Emergency — negotiate every simulated minute for 8 hours (480 minutes).</li>
+    <li><b>A market clock</b> that only announces a price. Agents decide how much to ask for at that price. The clock never hands out power itself.</li>
+    <li><b>A ledger (referee)</b> that checks every deal against hard safety rules before committing it, plus a <b>fallback</b> safety net if negotiation fails.</li>
+    <li><b>Three baselines</b> to beat, run on the exact same disaster: Blind grab, Proportional cut, Static priority.</li>
+    <li><b>A live web dashboard</b> where judges watch the negotiation as a chat, see the numbers in charts, inject chaos, and compare strategies.</li>
+  </ul></div>
+
+  <div class="box warn"><b class="t">The result, honestly (20 different disasters)</b>
+  <ul>
+    <li><b>0 safety breaches</b> for our system on every run and every fuzz test. Blind grab breaches capacity ~414 times per run.</li>
+    <li><b>~4× less damage than Proportional</b> (190.9 vs 787.2) and <b>~18× less than Blind grab</b> (3368).</li>
+    <li><b>Static priority is about as good as us on damage</b> (194.0 vs our 190.9 — within noise). We beat it on <b>fairness</b> (0.990 vs 0.984) and <b>cascades</b> (2.65 vs 3.45). On seed 0 alone, priority actually has lower damage. We say this openly.</li>
+  </ul></div>
+
+  <div class="say">One-line pitch: "When power drops, the agents with backup — the water tank and the telecom battery —
+  volunteer to give up power first, so the hospital stays served. And a referee guarantees the grid is never overloaded."</div>
+
+
+</section>
+
+<!-- ============ REQUIREMENTS ============ -->
+<section class="page">
+  <div class="kicker">Requirements and safety</div>
+  <h2>What the PS asks for, and the rules we never break</h2>
+  <p class="sub">Use this page when the evaluator goes through the problem statement line by line.</p>
+  <h3>The PS checklist, ticked</h3>
+  <table>
+    <tr><th>PS requirement</th><th>How we meet it</th><th>Status</th></tr>
+    <tr><td>One autonomous agent per utility, decentralized</td><td>Each agent holds its own private need, damage function and state; it alone decides its bid.</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td>Real-time negotiation: bids, priorities, concessions</td><td>Price-based bidding rounds every minute (Layer 1). Bilateral concessions (Layer 2) are next.</td><td><span class="tag done">Bids done</span> <span class="tag next">Concessions next</span></td></tr>
+    <tr><td>Supply fluctuates</td><td>Seeded random walk + 3 scripted shocks + live chaos injected from the UI.</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td>Hard capacity limits never violated</td><td>Ledger validates every commit; independent invariant checker; fuzz-tested.</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td>Balance priority vs fairness</td><td>Weighted bidding + Jain's fairness index reported. Credit system (fairness memory) is next.</td><td><span class="tag done">Measured</span> <span class="tag next">Credits next</span></td></tr>
+    <tr><td>Minimise total damage over hours</td><td>Agents bid by marginal damage; total damage measured over 8 h vs baselines.</td><td><span class="tag done">Done</span></td></tr>
+  </table>
+  <h3>Safety rules (invariants)</h3>
+  <table>
+    <tr><th>Rule</th><th>Meaning</th></tr>
+    <tr><td>INV-1</td><td>Total power handed out ≤ power available, every minute.</td></tr>
+    <tr><td>INV-2</td><td>Every grant is between 0 and that utility's maximum draw.</td></tr>
+    <tr><td>INV-3</td><td>Commits are atomic: all agents updated, or none.</td></tr>
+    <tr><td>INV-4</td><td>Every commit passes ledger validation first.</td></tr>
+    <tr><td>INV-5</td><td>The fallback is always feasible (fixed water-filling by weight with critical floors, no randomness).</td></tr>
+  </table>
+  <div class="box green"><b class="t">In plain words</b>
+  The agents are free to negotiate however they like, but nothing they agree on reaches the grid until the ledger confirms
+  it fits the supply and every limit. If they can't agree in 8 rounds, a fixed, always-safe split is used instead. That is how
+  we get freedom for the agents and safety for the grid at the same time.</div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="page">
+  <div class="kicker">The idea, simply</div>
+  <h2>How it works: an auction every minute</h2>
+  <p class="sub">Think of it as a tiny auction held 480 times, with a strict referee.</p>
+
+  <div class="grid4">
+    <div class="card"><div class="ico" style="color:var(--h)">🏥</div><b>Hospital</b><small>Needs 38 MW. Fine if cut a little, but past ~25% short the ICU fails fast. Most important.</small></div>
+    <div class="card"><div class="ico" style="color:var(--w)">💧</div><b>Water</b><small>Needs 24 MW. Has a reservoir, so it can survive a cut for a while.</small></div>
+    <div class="card"><div class="ico" style="color:var(--t)">📡</div><b>Telecom</b><small>Needs 14 MW. Has a battery. Fine until the battery runs out, then towers go dark.</small></div>
+    <div class="card"><div class="ico" style="color:var(--e)">🚑</div><b>Emergency</b><small>Needs 16 MW. Every MW short hurts a bit. Worse if telecom is down (crews can't coordinate).</small></div>
+  </div>
+
+  <h3>What happens each simulated minute</h3>
+  <div class="step"><span class="num">1</span><div><b>Supply update.</b> The grid announces how much power exists right now (e.g. 66 MW after a substation failure).</div></div>
+  <div class="step"><span class="num">2</span><div><b>Market clock announces a price.</b> It starts from last minute's price.</div></div>
+  <div class="step"><span class="num">3</span><div><b>Each agent bids privately.</b> "At this price, I want X MW." An agent asks for power only while each extra MW saves more damage than the price. Water with a full tank asks for less; the hospital near its cliff asks for all of it.</div></div>
+  <div class="step"><span class="num">4</span><div><b>Price adjusts.</b> If total bids exceed supply, price goes up; if below, it goes down. Repeat up to 8 rounds until bids fit.</div></div>
+  <div class="step"><span class="num">5</span><div><b>Ledger checks and commits.</b> Total ≤ supply? Every grant within limits? If yes, commit for everyone at once. If no — or no agreement after 8 rounds — the <b>fallback</b> applies a safe fixed split. The grid can never be overloaded.</div></div>
+  <div class="step"><span class="num">6</span><div><b>Damage is scored.</b> Each agent's shortfall becomes "damage", buffers drain or refill, cascades are checked.</div></div>
+
+  <div class="box"><b class="t">The key design rule</b>
+  <b>Agents decide; infrastructure only aggregates and validates.</b> The market clock only adds up bids and sets a price.
+  The ledger only says yes or no. Nobody central "allocates" power — that's what makes it decentralized.
+  No AI/LLM is used in any decision; it is all deterministic math, so the same seed always gives exactly the same result.</div>
+
+  <h3>Cascades (things that make it worse)</h3>
+  <ul>
+    <li><b>Cascade A:</b> water pressure collapses (reservoir under 20%) → hospital cooling load goes up 20%.</li>
+    <li><b>Cascade B:</b> telecom battery empty → emergency services lose coordination → their damage counts 1.5×.</li>
+  </ul>
+  <p>This is why smart agents matter: letting the telecom battery run dry is expensive later, so the negotiation has to look ahead, not just fix this minute.</p>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="page">
+  <div class="kicker">Architecture</div>
+  <h2>How the pieces fit together</h2>
+  <p class="sub">Three layers: a pure engine, an API that streams it, and the dashboard.</p>
+
+  <svg class="diagram" viewBox="0 0 720 470" font-family="Plus Jakarta Sans, sans-serif">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7A8494"/></marker>
+    </defs>
+    <!-- engine -->
+    <rect x="10" y="10" width="700" height="250" rx="14" fill="#F4F6FA" stroke="#E3E7EE"/>
+    <text x="28" y="36" font-size="13" font-weight="800" fill="#1F2733">ENGINE · Python (engine/blackout_arena)</text>
+    <text x="28" y="54" font-size="10" fill="#7A8494">pure + deterministic: seeded RNG, no wall clock, no LLM</text>
+    <g font-size="11" font-weight="700">
+      <rect x="28" y="70" width="150" height="40" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="40" y="94" fill="#1F2733">Scenario + supply</text>
+      <rect x="28" y="120" width="150" height="40" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="40" y="144" fill="#1F2733">Damage model (yaml)</text>
+      <rect x="210" y="70" width="190" height="90" rx="10" fill="#fff" stroke="#2F5A8A"/><text x="224" y="92" fill="#2F5A8A">4 Agents</text>
+      <text x="224" y="110" font-weight="500" font-size="10" fill="#4B5563">Hospital · Water · Telecom ·</text>
+      <text x="224" y="124" font-weight="500" font-size="10" fill="#4B5563">Emergency. Private need,</text>
+      <text x="224" y="138" font-weight="500" font-size="10" fill="#4B5563">state, damage; bid(price)</text>
+      <rect x="432" y="70" width="120" height="40" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="444" y="94" fill="#1F2733">Market clock</text>
+      <rect x="432" y="120" width="120" height="40" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="444" y="144" fill="#1F2733">Ledger</text>
+      <rect x="576" y="70" width="120" height="40" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="588" y="94" fill="#1F2733">Fallback split</text>
+      <rect x="576" y="120" width="120" height="40" rx="8" fill="#fff" stroke="#C62F3B"/><text x="588" y="144" fill="#C62F3B">Invariants check</text>
+      <rect x="28" y="190" width="220" height="50" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="40" y="212" fill="#1F2733">Simulation loop</text><text x="40" y="228" font-weight="500" font-size="10" fill="#4B5563">480 ticks = 8 simulated hours</text>
+      <rect x="270" y="190" width="200" height="50" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="282" y="212" fill="#1F2733">Baselines</text><text x="282" y="228" font-weight="500" font-size="10" fill="#4B5563">blind · proportional · priority</text>
+      <rect x="492" y="190" width="204" height="50" rx="8" fill="#fff" stroke="#E3E7EE"/><text x="504" y="212" fill="#1F2733">Metrics</text><text x="504" y="228" font-weight="500" font-size="10" fill="#4B5563">damage · breaches · Jain · cascades</text>
+    </g>
+    <g stroke="#7A8494" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+      <path d="M178 90H208"/><path d="M178 140H208"/>
+      <path d="M400 90H430"/><path d="M492 110V118"/><path d="M552 140H574"/><path d="M552 90H574"/>
+    </g>
+    <text x="404" y="84" font-size="9" fill="#7A8494">bids</text>
+    <!-- event log -->
+    <rect x="200" y="282" width="320" height="44" rx="10" fill="#1F2733"/>
+    <text x="222" y="303" font-size="12" font-weight="800" fill="#fff">Event log (append-only JSONL)</text>
+    <text x="222" y="318" font-size="9.5" fill="#B3BDCB">BID · PRICE · COMMIT · DAMAGE · CASCADE · TICK_SUMMARY …</text>
+    <path d="M360 260V280" stroke="#7A8494" stroke-width="1.4" marker-end="url(#ar)"/>
+    <!-- api -->
+    <rect x="10" y="350" width="330" height="110" rx="14" fill="#EAF1FA" stroke="#CFDDF0"/>
+    <text x="28" y="376" font-size="13" font-weight="800" fill="#1F2733">API · FastAPI (api/)</text>
+    <text x="28" y="396" font-size="10" fill="#4B5563">POST /runs · WS /runs/{id}/stream</text>
+    <text x="28" y="412" font-size="10" fill="#4B5563">POST /runs/{id}/chaos · /control (speed, pause)</text>
+    <text x="28" y="428" font-size="10" fill="#4B5563">GET /runs/{id}/events (replay) · GET /compare</text>
+    <text x="28" y="446" font-size="10" fill="#7A8494">playback pace lives only here</text>
+    <!-- web -->
+    <rect x="380" y="350" width="330" height="110" rx="14" fill="#E6F5EE" stroke="#C5E6D6"/>
+    <text x="398" y="376" font-size="13" font-weight="800" fill="#1F2733">DASHBOARD · React + Vite (web/)</text>
+    <text x="398" y="396" font-size="10" fill="#4B5563">Live: agent tiles, 4 synced charts, chat</text>
+    <text x="398" y="412" font-size="10" fill="#4B5563">Timeline scrubber · Chaos panel · Compare</text>
+    <text x="398" y="428" font-size="10" fill="#4B5563">Light / dark · phone layout</text>
+    <text x="398" y="446" font-size="10" fill="#7A8494">chat lines = templates over real numbers</text>
+    <path d="M300 326L230 348" stroke="#7A8494" stroke-width="1.4" marker-end="url(#ar)"/>
+    <path d="M340 405H378" stroke="#7A8494" stroke-width="1.4" marker-end="url(#ar)"/>
+    <text x="344" y="398" font-size="9" fill="#7A8494">WebSocket</text>
+    <path d="M378 425H342" stroke="#C62F3B" stroke-width="1.4" marker-end="url(#ar)"/>
+    <text x="346" y="440" font-size="9" fill="#C62F3B">chaos</text>
+  </svg>
+
+  <h3>Why it is built this way</h3>
+  <ul>
+    <li><b>Engine is pure and deterministic.</b> Same seed + same config ⇒ byte-identical event log. That makes results reproducible and fair to compare.</li>
+    <li><b>The event log is the single source of truth.</b> The dashboard, the replay scrubber and the tests all read the same events.</li>
+    <li><b>Safety is checked twice.</b> The ledger validates before committing; a separate <code>invariants.py</code> re-checks every run (including baselines) afterwards.</li>
+    <li><b>Baselines face the identical disaster.</b> Same seed, same damage model, same checker — so the comparison is apples to apples.</li>
+  </ul>
+
+
+</section>
+
+<!-- ============ WEBSITE TOUR 1 ============ -->
+<section class="page">
+  <div class="kicker">The website</div>
+  <h2>Dashboard tour</h2>
+  <p class="sub">Run it with the API + web app (see last page). It opens straight into a live run.</p>
+
+  <figure><img src="img/linked_tooltip.png">
+  <figcaption><b>Live view, paused on minute 02:10 during the first shock.</b> Supply dropped to 66 MW.
+  <b>Top bar:</b> Live / Compare, strategy + seed, clock, pause, speed (1–60×), theme, Chaos.
+  <b>Left:</b> the city strip (lit windows = how much need is met), agent tiles (Telecom is <i>Down</i> — its battery hit 0%), totals (damage, fairness, cascades, breaches), then the charts.
+  <b>Right:</b> the negotiation chat — e.g. "Telecom went dark… emergency damage counts 1.5×" (Cascade B).
+  <b>Bottom:</b> timeline; red bands are the three scripted shocks.</figcaption></figure>
+
+  <div class="grid2">
+    <figure><img src="img/chat.png">
+    <figcaption><b>Negotiation chat.</b> Agents only speak when something changes (shock, status change, big bid move, buffer crossing 50/25/10%). Quiet stretches collapse into one grey line. Chips: <span style="color:var(--terra)">Urgent</span>, <span style="color:var(--green)">Can wait</span>, <span style="color:var(--w)">Yielding</span>, <span style="color:var(--red)">Shock/Cascade</span>. Lines are fixed templates filled with real numbers — no AI.</figcaption></figure>
+    <figure><img src="img/charts_lower.png">
+    <figcaption><b>The charts</b> (all share one cursor; click any minute to jump the chat there):
+    <b>Power split</b> who got what · <b>Need met</b> heatmap, red = cut · <b>Damage per minute</b> what each cut cost · <b>Buffers & price</b> reservoir, battery and market price.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============ READING THE CHARTS ============ -->
+<section class="page">
+  <div class="kicker">The website</div>
+  <h2>How to read the charts (and explain them)</h2>
+  <p class="sub">The questions an evaluator will point at.</p>
+
+  <h3>Power split — "who got what"</h3>
+  <p>Stacked colours are each utility's power grant per minute; the dashed line is total supply. During a shock the stack shrinks.
+  Notice the <b>red hospital band barely moves</b> — the others shrink first.</p>
+
+  <h3>Need met — "who was cut, and when"</h3>
+  <p>One row per utility, one column per minute. Green = fully served, yellow = partly, red = cut hard.
+  You can see Telecom go solid red during each shock, Water go yellow (draining its reservoir), and the Hospital stay mostly green.</p>
+
+  <h3>Damage per minute — "what each cut cost"</h3>
+  <p>Every minute, each utility that is short adds harm according to its damage curve
+  (hospital: nothing until 25% short, then a steep cliff; water: only when the reservoir is low; telecom: only once the battery is empty;
+  emergency: grows steadily, ×1.5 if telecom is down). It is flat at zero most of the time — everyone served — with
+  <b>three spikes at the three shocks</b>. The area under the curve is the total damage number (229.3 on seed 0). It is a <b>modeled proxy</b>, not real casualties.</p>
+
+  <h3>Buffers & price — "why water and telecom gave way"</h3>
+  <p>Blue = water reservoir, purple = telecom battery, dashed orange = market price.
+  When a shock hits, the price jumps; Water and Telecom (who can coast on their buffers) bid less, so the hospital stays served.
+  Their buffers drain, then refill after the shock. When the battery hits 0%, that is the red block in the heatmap and part of the cascade count.</p>
+
+  <div class="say">How to say it: "When power drops, the price goes up. Agents with backup volunteer first.
+  Damage only appears once those backups run out — and you can see exactly when that happens."</div>
+
+  <div class="grid2">
+    <figure><img src="img/chaos.png"><figcaption><b>Inject chaos</b> into the live run: knock out a substation (−MW), ICU surge (+hospital need), or burst a water main (reservoir drains faster). Agents renegotiate from the next minute. Great for a live demo: let the judge press it.</figcaption></figure>
+    <figure><img src="img/live_dark.png"><figcaption><b>Dark mode</b> (follows the system, toggle in the top bar). Useful on a projector.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="page">
+  <div class="kicker">Results</div>
+  <h2>Numbers — measured, not invented</h2>
+  <p class="sub">All four strategies run on the same disaster, same damage model, same independent safety checker.</p>
+
+  <figure><img src="img/compare.png" style="height:62mm"><figcaption><b>Compare view, seed 0.</b> Damage accumulating over 8 hours. Note that on this seed Static priority (orange) ends slightly below us — the UI marks it "best" honestly.</figcaption></figure>
+
+  <h3>Seed 0 (the default disaster)</h3>
+  <table>
+    <tr><th>Strategy</th><th class="n">Total damage ↓</th><th class="n">Safety breaches ↓</th><th class="n">Fairness (Jain) ↑</th><th class="n">Cascades ↓</th></tr>
+    <tr class="ours"><td>Ours (negotiation)</td><td class="n">229.3</td><td class="n best">0</td><td class="n">0.989</td><td class="n best">2</td></tr>
+    <tr><td>Static priority</td><td class="n best">204.8</td><td class="n best">0</td><td class="n">0.984</td><td class="n">4</td></tr>
+    <tr><td>Proportional</td><td class="n">890.3</td><td class="n best">0</td><td class="n best">1.000</td><td class="n best">2</td></tr>
+    <tr><td>Blind grab</td><td class="n">3300.6</td><td class="n">390</td><td class="n best">1.000</td><td class="n">392</td></tr>
+  </table>
+
+  <h3>Across 20 seeds (mean ± std) — the number to quote</h3>
+  <table>
+    <tr><th>Strategy</th><th class="n">Total damage ↓</th><th class="n">Breaches ↓</th><th class="n">Fairness ↑</th><th class="n">Cascades ↓</th></tr>
+    <tr class="ours"><td>Ours (negotiation)</td><td class="n best">190.9 ± 70.6</td><td class="n best">0</td><td class="n">0.990 ± 0.002</td><td class="n best">2.65 ± 2.20</td></tr>
+    <tr><td>Static priority</td><td class="n">194.0 ± 58.6</td><td class="n best">0</td><td class="n">0.984 ± 0.004</td><td class="n">3.45 ± 0.59</td></tr>
+    <tr><td>Proportional</td><td class="n">787.2 ± 153.0</td><td class="n best">0</td><td class="n best">1.000</td><td class="n">2.80 ± 1.86</td></tr>
+    <tr><td>Blind grab</td><td class="n">3368.1 ± 281.4</td><td class="n">413.9 ± 33.1</td><td class="n best">1.000</td><td class="n">415.9 ± 33.1</td></tr>
+  </table>
+
+  <div class="box warn"><b class="t">How to talk about this honestly</b>
+  <ul>
+    <li><b>Our claim is a damage + fairness trade-off, not a clean sweep.</b></li>
+    <li>vs Blind grab: it overloads the grid ~400 times a run. We never do.</li>
+    <li>vs Proportional: it is "perfectly fair" (everyone cut equally) but causes ~4× more damage, because cutting the hospital 30% is far worse than cutting water 30%.</li>
+    <li>vs Static priority: about the same damage on average, but priority is rigid — it always starves water/telecom first, so it triggers more cascades and is less fair. Ours adapts to actual state (full tank vs empty tank).</li>
+    <li>Fairness of 1.000 for Proportional/Blind just means everyone was cut equally — not that it was good.</li>
+  </ul></div>
+</section>
+
+<!-- ============ TESTING + STATUS ============ -->
+<section class="page">
+  <div class="kicker">Proof and progress</div>
+  <h2>Testing, and what's done vs next</h2>
+
+  <h3>Testing — 123 automated tests, all passing</h3>
+  <ul>
+    <li><b>Determinism:</b> same seed + config produces an identical event log.</li>
+    <li><b>Ledger:</b> rejects an over-capacity proposal and a partial commit.</li>
+    <li><b>Property-based fuzzing (Hypothesis):</b> 1,500 random cases for the fallback split, 1,000 random ledger proposals, and 60 full simulations with random seeds and shocks — 0 invariant violations.</li>
+    <li><b>Fuzz script:</b> <code>scripts/fuzz.py --runs 1000</code> runs 1,000 random disasters against our strategy.</li>
+    <li><b>Blind grab baseline</b> is confirmed to breach capacity on the default scenario (proving the checker works).</li>
+    <li><b>API tests:</b> full live stream with chaos injected, 0 violations; event replay; compare endpoint.</li>
+    <li>Fallback was never needed in the 20-seed benchmark (0 fallback minutes) — negotiation always settled within 8 rounds.</li>
+  </ul>
+
+  <h3>Status</h3>
+  <table>
+    <tr><th>Phase</th><th>What</th><th>Status</th></tr>
+    <tr><td>1 · Must</td><td>Models, events, config, 4 agents + damage functions, market clock, Layer 1 bidding, ledger + invariants + fallback, simulation loop, event log, 3 baselines, metrics, benchmark + fuzz scripts</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td>2 · Must</td><td>FastAPI (runs, live WebSocket stream, chaos, control, replay, compare). Dashboard: live charts, negotiation chat, timeline scrubber, chaos panel, compare view, dark mode, phone layout</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td>3 · Should</td><td>Layer 2 bilateral concessions ("Water: I'll give Hospital 5 MW for 20 min"), credit-based fairness memory, multi-seed results in UI, presenter mode for the pitch</td><td><span class="tag next">Next</span></td></tr>
+    <tr><td>4 · Nice</td><td>Ablations (ours without Layer 2 / without credit), plain-English explanations, export report</td><td><span class="tag next">If time</span></td></tr>
+  </table>
+
+  <h3>Layer 2 and credits — what they will add</h3>
+  <p><b>Layer 2:</b> after the price settles, an agent with spare capacity (e.g. Water with a full tank) directly offers MW to an agent in trouble; the other can accept, counter or reject.
+  <b>Credits:</b> the agent that gives power banks credit, which raises its weight later — so yielding today is rewarded tomorrow. This is the "fairness over time" part of the PS and should widen our lead over Static priority.</p>
+
+  <h3>Tech stack</h3>
+  <p>Python 3.11+, pydantic v2, numpy, FastAPI, uvicorn, pytest, hypothesis · React 18, Vite, Recharts · deterministic seeded RNG (PCG64).</p>
+</section>
+
+<!-- ============ Q&A + RUN ============ -->
+<section class="page">
+  <div class="kicker">Meeting prep</div>
+  <h2>Likely questions, and how to run it</h2>
+
+  <div class="q">Why is it "decentralized" if there's a market clock?</div>
+  <div class="a">The clock only adds up bids and announces a price — it never decides who gets what. Each agent decides its own demand from its private state. The ledger only says yes/no to safety.</div>
+  <div class="q">Where is the AI?</div>
+  <div class="a">The agents are rule-based autonomous agents doing marginal-damage reasoning. We deliberately keep LLMs out of decisions so results are deterministic, explainable and safe. (A plain-English explanation layer may come later, after decisions are committed.)</div>
+  <div class="q">Can it ever overload the grid?</div>
+  <div class="a">Not in any test: every commit is validated, the fallback is always feasible, and fuzz tests over thousands of random cases found 0 violations. We say "tested", not "proven".</div>
+  <div class="q">Static priority has lower damage on seed 0 — why use yours?</div>
+  <div class="a">Across 20 seeds we're level on damage (190.9 vs 194.0) and better on fairness and cascades. Priority is a fixed ranking; ours reacts to real state. Layer 2 + credits (next phase) target exactly this gap.</div>
+  <div class="q">Where do the damage numbers come from?</div>
+  <div class="a">A modeled proxy with editable parameters in <code>config/damage.yaml</code> (cliff for hospital, buffers for water/telecom, linear for emergency, cascade multipliers). Relative comparison is what matters.</div>
+  <div class="q">Is it real-time?</div>
+  <div class="a">Yes — the dashboard streams the simulation live over a WebSocket; you can change speed, pause, scrub back, and inject chaos mid-run.</div>
+
+  <h3>Run it</h3>
+  <pre>pip install pydantic numpy pyyaml fastapi "uvicorn[standard]" httpx pytest hypothesis
+npm --prefix web install
+
+# terminal 1 — API
+python -m uvicorn api.app:app --port 8010
+# terminal 2 — dashboard → open http://localhost:5173
+npm --prefix web run dev
+
+# tests and benchmarks
+python -m pytest -q
+python scripts/run_benchmark.py --seeds 20
+python scripts/run_one.py --strategy ours --seed 0</pre>
+
+  <h3>3-minute demo script</h3>
+  <div class="step"><span class="num">1</span><div>Open the dashboard at 4×. "Four utilities, ~100 MW, 92 needed. Each is an agent."</div></div>
+  <div class="step"><span class="num">2</span><div>At the first shock (01:30, −30 MW): point at the chat — Water and Telecom say "I can wait"; hospital stays green in the heatmap.</div></div>
+  <div class="step"><span class="num">3</span><div>Press <b>Chaos → Knock out a substation</b>. Watch them renegotiate next minute; breaches stay 0.</div></div>
+  <div class="step"><span class="num">4</span><div>Switch to <b>Compare</b>: same disaster, four strategies. Quote the 20-seed numbers and be honest about Static priority.</div></div>
+  <div class="step"><span class="num">5</span><div>Close: "Decentralized agents, zero safety breaches, and a damage + fairness trade-off we can measure."</div></div>
+</section>
+
+</body>
+</html>

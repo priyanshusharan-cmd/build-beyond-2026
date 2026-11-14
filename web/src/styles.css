@@ -372,3 +372,38 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
   .btn.danger { width: 36px; padding: 0; }
   .panel-head .sub { display: none; }
 }
+.tl-track { margin-top: 12px; }
+.tl-time { position: absolute; top: -14px; translate: -50% 0; font-size: 12px; font-weight: 700; color: var(--ink);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; line-height: 18px;
+  pointer-events: none; box-shadow: var(--shadow); }
+.replay-tag { font-size: 12px; font-weight: 600; color: var(--amber); background: var(--amber-soft); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+
+/* ---------- chaos countdown overlay ---------- */
+.countdown { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; pointer-events: none;
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--red) 18%, transparent), color-mix(in srgb, var(--bg) 55%, transparent) 70%);
+  backdrop-filter: blur(3px); animation: cd-fade 200ms var(--ease-out); }
+.cd-card { display: flex; flex-direction: column; align-items: center; gap: var(--s2); }
+.cd-label { display: inline-flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+  color: var(--red); background: var(--panel); border: 1px solid var(--line); padding: 8px 18px; border-radius: 999px; box-shadow: var(--shadow-lg); }
+.cd-label .ms { font-size: 24px; }
+.cd-ring { position: relative; width: 260px; height: 260px; display: grid; place-items: center; }
+.cd-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.cd-track { fill: color-mix(in srgb, var(--panel) 85%, transparent); stroke: var(--line); stroke-width: 6; }
+.cd-prog { fill: none; stroke: var(--red); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 339.3; stroke-dashoffset: 0;
+  animation: cd-drain 1000ms linear forwards; }
+.cd-num { position: relative; font-size: 160px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: var(--ink);
+  animation: cd-pop 1000ms var(--ease-out); }
+.cd-sub { font-size: 16px; font-weight: 600; color: var(--ink-2); background: color-mix(in srgb, var(--panel) 80%, transparent); padding: 4px 12px; border-radius: 8px; }
+.cd-impact { font-size: 120px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: var(--red); animation: cd-slam 500ms var(--ease-out); }
+.countdown.impact { animation: cd-flash 900ms var(--ease-out); }
+@keyframes cd-fade { from { opacity: 0; } }
+@keyframes cd-pop { 0% { transform: scale(1.35); opacity: 0; filter: blur(6px); } 25% { transform: scale(1); opacity: 1; filter: blur(0); } 85% { opacity: 1; } 100% { transform: scale(0.92); opacity: 0.2; } }
+@keyframes cd-drain { to { stroke-dashoffset: 339.3; } }
+@keyframes cd-slam { 0% { transform: scale(1.6); opacity: 0; } 60% { transform: scale(0.96); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes cd-flash { 0% { background-color: color-mix(in srgb, var(--red) 45%, transparent); } 100% { background-color: transparent; } }
+@media (max-width: 899px) { .cd-ring { width: 180px; height: 180px; } .cd-num { font-size: 104px; } .cd-impact { font-size: 64px; } .cd-label { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .cd-num, .cd-impact, .countdown, .countdown.impact { animation: cd-fade 150ms ease; } .cd-prog { animation: none; } }
+.tl-track { cursor: pointer; touch-action: none; }
+.tl-track input { pointer-events: none; }
+.tl-hint { position: absolute; top: 26px; translate: -50% 0; font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--amber);
+  background: var(--amber-soft); border-radius: 6px; padding: 0 6px; line-height: 18px; pointer-events: none; animation: fade 150ms ease; }

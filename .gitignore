@@ -9,3 +9,4 @@ results/
 .venv/
 template.pdf
 .claude/
+.playwright-mcp/

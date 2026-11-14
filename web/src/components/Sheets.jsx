@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { STRATEGIES, prefersReducedMotion } from '../lib.js'
+import { STRATEGIES, hhmm, prefersReducedMotion } from '../lib.js'
 
 function Sheet({ title, sub, onClose, children }) {
   const ref = useRef(null)
@@ -61,8 +61,8 @@ export function ChaosSheet({ onInject, onClose, disabled }) {
   const fire = async (k) => {
     setBusy(k.kind); setMsg(null)
     try {
-      const r = await onInject(k.kind, { [k.key]: vals[k.kind], duration })
-      setMsg({ ok: true, text: `${k.label}: hits at minute ${r.queued.tick}. Watch the chat.` })
+      const r = await onInject(k.kind, { [k.key]: vals[k.kind], duration }, k)
+      setMsg({ ok: true, text: `${k.label} hits now (${hhmm(r.queued.tick)} on the clock) for ${duration} min. Watch the chat.` })
     } catch (e) { setMsg({ ok: false, text: e.message }) } finally { setBusy(null) }
   }
   return (
@@ -78,8 +78,8 @@ export function ChaosSheet({ onInject, onClose, disabled }) {
             <label className="field"><span className="field-row"><span>{k.field}</span><span className="num">{vals[k.kind]}{k.unit}</span></span>
               <input type="range" min={k.min} max={k.max} step={k.step} value={vals[k.kind]} onChange={(e) => setVals((v) => ({ ...v, [k.kind]: +e.target.value }))} />
             </label>
-            <button className="btn danger sm" disabled={disabled || busy === k.kind} onClick={() => fire(k)}>
-              {busy === k.kind ? 'Striking…' : 'Strike now'}
+            <button className="btn danger sm" disabled={disabled || busy != null} onClick={() => fire(k)}>
+              {busy === k.kind ? 'Counting down…' : 'Strike in 5 s'}
             </button>
           </div>
         </div>
