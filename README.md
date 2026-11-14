@@ -7,6 +7,25 @@ against three baselines on the same seeded disaster.
 
 Team ScaredToCompile: Priyanshu Sharan (lead), Abdul Khadar D Jamadar.
 
+## Branches
+
+- `main` is the default branch. It carries the Material 3 dashboard and the Layer 2 negotiation
+  (bilateral concessions, credit, ablations).
+- `main-old` is the previous stable version (the earlier dashboard, before Layer 2). Kept for reference:
+  `git checkout main-old`.
+
+## How the negotiation works
+
+1. **Layer 1, price discovery.** A market clock publishes a scarcity price. Each agent bids the power it still
+   wants at that price; the clock never allocates power.
+2. **Layer 2, bilateral bargaining.** Agents with low marginal damage (for example Water with a full reservoir)
+   offer to yield MW for 5 minutes to agents with high marginal damage. The counterparty accepts, counters or
+   rejects. Yielders bank credit, which raises their bid weight later; debts are tracked but never starve an agent.
+3. **Ledger.** Every allocation is proposed, validated against the safety invariants and committed atomically.
+   If negotiation does not settle or the ledger rejects it, a deterministic fallback split is applied.
+
+Each tick also emits plain-English `EXPLANATION` events built from fixed templates (no LLM).
+
 ## Requirements
 
 - Python 3.11 or newer
@@ -70,6 +89,7 @@ If port 8010 is taken, run the API on another port and tell Vite: `API_PORT=8011
 - **Left pane:** agent status tiles and four synced charts: power split, need met (heatmap),
   damage per minute, buffers and price. Hover for a detailed tooltip; click to pin a minute.
 - **Right pane:** the negotiation chat. Agents speak only when something changes; quiet minutes collapse.
+  Layer 2 deals show as messages from the yielding agent; the tiles show each agent's credit.
   Hover or click a message to move the chart cursor to that minute.
 - **Bottom:** timeline scrubber. Red bands are scripted shocks, orange ticks are chaos you injected.
 - **Chaos:** knock out a substation, trigger an ICU surge, or burst a water main during a live run.
@@ -93,13 +113,24 @@ Run one strategy on one seed and print a readable timeline (writes the JSONL eve
 python scripts/run_one.py --strategy ours --seed 0
 ```
 
-Strategies: `ours`, `blind`, `proportional`, `priority`.
+Strategies: `ours`, `blind`, `proportional`, `priority`, plus the ablations `ours_no_l2` (no Layer 2) and
+`ours_no_credit` (no credit).
 
 Multi-seed benchmark (mean ± std for every strategy; writes `results.json` and CSV to `results/`):
 
 ```bash
 python scripts/run_benchmark.py --seeds 20
 ```
+
+Add `--ablations` to include the two ablations, then export a Markdown report to `docs/RESULTS.md`:
+
+```bash
+python scripts/run_benchmark.py --seeds 20 --ablations
+python scripts/export_report.py
+```
+
+Every number in the report comes from the benchmark output. Where a baseline matches or beats our system,
+the report shows it as is.
 
 Fuzz our strategy with random supply walks and shocks (expects 0 invariant violations):
 
@@ -116,8 +147,9 @@ engine/blackout_arena/      agents, market clock, ledger, invariants, simulation
 api/                        FastAPI app: runs, WebSocket stream, chaos, compare
 web/                        React + Vite dashboard
 tests/                      pytest + hypothesis
-scripts/                    run_one, run_benchmark, fuzz
+scripts/                    run_one, run_benchmark, export_report, fuzz
 docs/STATUS.md              what is done / in progress / next
+docs/RESULTS.md             latest benchmark report (generated)
 ```
 
 ## API
