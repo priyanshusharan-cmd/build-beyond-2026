@@ -492,6 +492,8 @@ button { cursor: pointer; border: 0; background: none; padding: 0; }
   transition: background-color var(--dur-medium) var(--ease-standard);
   animation: msg-in var(--dur-medium-2) var(--ease-emph-decel) both;
 }
+/* list items keep their height; the pane scrolls instead of squashing them */
+.chat-body > * { flex-shrink: 0; }
 .msg.active { background: var(--md-secondary-container); }
 @media (hover: hover) and (pointer: fine) {
   .msg:hover:not(.active), .quiet:hover:not(.active) { background: color-mix(in oklab, var(--md-on-surface) 6%, transparent); }
