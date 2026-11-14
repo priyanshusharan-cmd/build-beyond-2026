@@ -16,7 +16,7 @@ export function useTheme() {
   const theme = choice ?? os
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0E131B' : '#F4F6FA')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#111418' : '#F8F9FF')
   }, [theme])
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
@@ -27,6 +27,6 @@ export function useTheme() {
 }
 
 export const CHART_THEME = {
-  light: { axis: '#8A94A3', grid: '#E9ECF1', ink: '#1F2733', heatBg: '#F1F3F6', price: '#C4622D', shock: '#C62F3B', chaos: '#C4622D' },
-  dark: { axis: '#7D8A9C', grid: '#232C3A', ink: '#E7ECF3', heatBg: '#1C2431', price: '#F0956A', shock: '#FF7B84', chaos: '#F0956A' },
+  light: { axis: '#73777F', grid: '#DCE0E7', ink: '#191C20', heatBg: '#ECEEF4', heatLow: [186, 26, 26], heatMid: [125, 87, 0], heatHigh: [40, 108, 76], price: '#6B5778', shock: '#BA1A1A', chaos: '#6B5778' },
+  dark: { axis: '#8D9199', grid: '#2B2F35', ink: '#E1E2E9', heatBg: '#1D2024', heatLow: [147, 0, 10], heatMid: [121, 86, 10], heatHigh: [0, 82, 47], price: '#D7BDE4', shock: '#FFB4AB', chaos: '#D7BDE4' },
 }

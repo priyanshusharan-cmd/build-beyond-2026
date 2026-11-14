@@ -49,19 +49,19 @@ const shapes = {
 }
 
 export const SPEAKERS = {
-  hospital: { name: 'Hospital', color: '#D64B68', soft: '#FBE7EB' },
-  water: { name: 'Water', color: '#2B7FC4', soft: '#E1EEFA' },
-  telecom: { name: 'Telecom', color: '#7552C8', soft: '#EDE6FA' },
-  emergency: { name: 'Emergency', color: '#198F6A', soft: '#DDF3EA' },
-  market: { name: 'Market clock', color: '#5B6472', soft: '#EEF0F3' },
-  ledger: { name: 'Ledger', color: '#5B6472', soft: '#EEF0F3' },
-  chaos: { name: 'Disaster', color: '#C62F3B', soft: '#FCE4E5' },
+  hospital: { name: 'Hospital', color: 'var(--agent-hospital)' },
+  water: { name: 'Water', color: 'var(--agent-water)' },
+  telecom: { name: 'Telecom', color: 'var(--agent-telecom)' },
+  emergency: { name: 'Emergency', color: 'var(--agent-emergency)' },
+  market: { name: 'Market clock', color: 'var(--md-on-surface-variant)' },
+  ledger: { name: 'Ledger', color: 'var(--md-on-surface-variant)' },
+  chaos: { name: 'Disaster', color: 'var(--md-error)' },
 }
 
 export function Avatar({ who, size = 32 }) {
   const s = SPEAKERS[who] ?? SPEAKERS.market
   return (
-    <span className="avatar" style={{ width: size + 8, height: size + 8, background: `linear-gradient(145deg, color-mix(in srgb, ${s.color} 22%, transparent), color-mix(in srgb, ${s.color} 8%, transparent))` }}>
+    <span className="avatar" style={{ width: size + 8, height: size + 8, background: `linear-gradient(145deg, color-mix(in oklab, ${s.color} 20%, transparent), color-mix(in oklab, ${s.color} 7%, transparent))` }}>
       <svg {...S} width={size} height={size}>{(shapes[who] ?? shapes.market)(s.color)}</svg>
     </span>
   )

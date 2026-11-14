@@ -15,7 +15,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      output: { manualChunks: { charts: ['recharts'], motion: ['gsap'] } },
+      output: { manualChunks: { charts: ['recharts'] } },
     },
   },
 })

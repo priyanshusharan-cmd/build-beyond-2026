@@ -101,6 +101,10 @@ export function useRun() {
     return api(`/runs/${info.run_id}/chaos`, { method: 'POST', body: { kind, params } })
   }, [info])
 
+  // Sink for the 3D stage. useRun stays the only WebSocket owner; the store is a mirror the
+  // frame loop can read imperatively, so the scene never causes a React render (and the flat
+  // dashboard below keeps reading the same React state it always did).
+
   useEffect(() => () => { ws.current?.close(); cancelAnimationFrame(raf.current) }, [])
 
   return { info, rows, snapshot, metrics, error, connected, start, control, chaos }

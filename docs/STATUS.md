@@ -49,6 +49,45 @@
 - Run: `python -m uvicorn api.app:app --port 8010` and `npm --prefix web run dev` (Vite proxies /api -> 8010).
   Needs `pip install websockets` (uvicorn[standard]) for WS.
 
+## Phase 4 (Material 3 UI pass) — DONE, verified in browser
+The 3D stage was REMOVED on request (too busy / too cinematic for the judging context).
+Deleted: web/src/stage/**, web/src/store/runStore.js, web/public/hdri/.
+Dropped deps: three, @react-three/fiber, @react-three/drei, @react-three/postprocessing,
+postprocessing, gsap, zustand, framer-motion, @phosphor-icons/react. useRun.js no longer
+mirrors into a store; App has two views (Live | Compare). Engine and API untouched.
+
+- web/src/styles.css is now a Material Design 3 token system:
+  * colour — a full M3 tonal scheme (--md-primary/secondary/tertiary/error + containers,
+    surface + surface-container-lowest…highest, outline/outline-variant, inverse-*), light and
+    dark. The dark block is written twice on purpose (media query + [data-theme="dark"]) since
+    custom properties cannot be shared across a media boundary.
+  * type — Roboto Flex (variable) + Roboto Mono for every number; M3 type scale sizes/tracking.
+  * shape 4/8/12/16/28/full, elevation levels 0–5, M3 motion tokens (standard / emphasized /
+    emphasized-decelerate easings, 100–500ms), state layers at 8%/10% on every pressable.
+  * one creamy wash on body::before (primary/tertiary/secondary at 7–9% alpha); no per-panel gradients.
+- Components mapped to M3 patterns: small top app bar, segmented buttons (views, speed, mobile tabs),
+  filled/tonal/text/icon buttons, assist chip (run chip), filled cards, linear progress (meters),
+  tonal badges (status), list items (chat), basic dialogs (run / chaos / method), M3 slider (timeline).
+- Agent colours are now scheme-aligned and theme-aware: AGENT_META[a].hex (light) / .dark,
+  resolved by agentHex(a, theme) for canvas/SVG; CSS uses --agent-* vars. CompareView is
+  theme-aware too (PALETTE + CHART_THEME).
+- Charts are live, not static: LiveLegend reads the value at the hovered/pinned minute for every
+  series; EventPins overlays scripted shocks, live chaos and cascades along the top of each plot;
+  the heatmap has a 0→100% ramp legend; areas use soft vertical gradient fills.
+- Chaos countdown is a restrained M3 dialog (determinate circular progress), not a cinematic slam.
+  NOTE: the digit's entrance animation must never start from opacity 0 — it is re-keyed every second
+  and the first element can sit in the from-state for ~1s, which hid it. It now fades 0.4→1.
+- Tiles: name row, big MW number, progress meter, note row with the status badge; the badge collapses
+  to a status dot under a 470px container. KPI strip (damage / fairness / cascades / breaches) spans
+  the full width with an ƒx button.
+- NEW: web/src/components/Method.jsx — one dialog, "How these numbers are computed", opened from the
+  KPI strip and from the Compare footer. States the per-agent damage functions and weights exactly as
+  config/damage.yaml and agents/*.py implement them, the cascade multipliers, and Jain's index
+  (sᵢ = mean over ticks of clip(served/need,0,1); J = (Σsᵢ)²/(n·Σsᵢ²), n = 4) with why it moves during a
+  run and the honest caveat that Jain is priority-blind. Keep this file in sync if damage.yaml changes.
+- Verified in the browser: light + dark, 1440x900 and 375x812, Live + Compare, method dialog, chaos
+  countdown and impact. `npm run build` passes (bundle down to 118 kB app + 560 kB recharts).
+
 ## Next
-1. Phase 3: Layer 2 concessions + credit, chaos panel, scrubber
-3. Nice: ablations, explanations
+1. Layer 2 concessions + credit/fairness (credits still stay 0 everywhere)
+2. Nice: ablations (ours without Layer 2, ours without credit), plain-English explanations

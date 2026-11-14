@@ -1,11 +1,14 @@
 export const AGENTS = ['hospital', 'water', 'telecom', 'emergency']
 
 export const AGENT_META = {
-  hospital: { label: 'Hospital', short: 'H', icon: 'cardiology', color: 'var(--hospital)', hex: '#D64B68' },
-  water: { label: 'Water', short: 'W', icon: 'water_drop', color: 'var(--water)', hex: '#2B7FC4' },
-  telecom: { label: 'Telecom', short: 'T', icon: 'cell_tower', color: 'var(--telecom)', hex: '#7552C8' },
-  emergency: { label: 'Emergency', short: 'E', icon: 'emergency', color: 'var(--emergency)', hex: '#198F6A' },
+  hospital: { label: 'Hospital', short: 'H', icon: 'cardiology', color: 'var(--agent-hospital)', hex: '#B02E4C', dark: '#FFB1C0' },
+  water: { label: 'Water', short: 'W', icon: 'water_drop', color: 'var(--agent-water)', hex: '#1A6CA8', dark: '#A3C9FE' },
+  telecom: { label: 'Telecom', short: 'T', icon: 'cell_tower', color: 'var(--agent-telecom)', hex: '#6350A8', dark: '#C9BFFF' },
+  emergency: { label: 'Emergency', short: 'E', icon: 'emergency', color: 'var(--agent-emergency)', hex: '#1E7355', dark: '#8FD6AE' },
 }
+
+/** Agent colour for a canvas/SVG context, which cannot read CSS variables. */
+export const agentHex = (a, theme = 'light') => (theme === 'dark' ? AGENT_META[a].dark : AGENT_META[a].hex)
 
 export const STRATEGIES = {
   ours: { label: 'Negotiation', sub: 'Our agents bid against a market price', icon: 'handshake' },

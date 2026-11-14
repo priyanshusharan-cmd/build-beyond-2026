@@ -1,9 +1,14 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { api, fmt, hhmm, STRATEGIES } from '../lib.js'
+import { CHART_THEME } from '../useTheme.js'
 
 const ORDER = ['ours', 'priority', 'proportional', 'blind']
-const COLORS = { ours: '#33557c', priority: '#c98a3c', proportional: '#8a63d2', blind: '#c8384f' }
+// Scheme roles: ours = primary, the baselines sit on warning / tertiary / error, per theme.
+const PALETTE = {
+  light: { ours: '#38608F', priority: '#7D5700', proportional: '#6B5778', blind: '#BA1A1A' },
+  dark: { ours: '#A3C9FE', priority: '#F3BF48', proportional: '#D7BDE4', blind: '#FFB4AB' },
+}
 const METRICS = [
   { key: 'total_damage', label: 'Total damage', icon: 'local_fire_department', better: 'low', d: 1, note: 'Modeled proxy over 8 hours' },
   { key: 'violations', label: 'Safety breaches', icon: 'gpp_maybe', better: 'low', d: 0, note: 'Grants above available supply' },
@@ -23,7 +28,10 @@ function Tip({ active, payload, label }) {
   )
 }
 
-function CompareView({ seed }) {
+function CompareView({ seed, theme = 'light', onExplain }) {
+  const COLORS = PALETTE[theme]
+  const ct = CHART_THEME[theme]
+  const axis = { stroke: ct.axis, tick: { fill: ct.axis, fontFamily: "'Roboto Mono', ui-monospace, monospace", fontSize: 11 }, tickLine: false, axisLine: false }
   const [data, setData] = useState(null)
   const [err, setErr] = useState(null)
   useEffect(() => {
@@ -50,12 +58,12 @@ function CompareView({ seed }) {
           {!data ? <div className="skeleton" /> : (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series} margin={{ top: 6, right: 8, left: -4, bottom: 0 }}>
-                <CartesianGrid stroke="rgba(24,33,45,0.07)" vertical={false} />
-                <XAxis dataKey="tick" type="number" domain={[0, 479]} ticks={[0, 60, 120, 180, 240, 300, 360, 420, 479]} tickFormatter={hhmm} stroke="#8a95a5" fontSize={11.5} tickLine={false} axisLine={false} />
-                <YAxis scale="sqrt" stroke="#8a95a5" fontSize={11.5} tickLine={false} axisLine={false} width={48} />
-                <Tooltip content={<Tip />} cursor={{ stroke: '#18212d', strokeOpacity: 0.2 }} />
+                <CartesianGrid stroke={ct.grid} vertical={false} />
+                <XAxis {...axis} dataKey="tick" type="number" domain={[0, 479]} ticks={[0, 60, 120, 180, 240, 300, 360, 420, 479]} tickFormatter={hhmm} />
+                <YAxis {...axis} scale="sqrt" width={48} />
+                <Tooltip content={<Tip />} cursor={{ stroke: ct.ink, strokeOpacity: 0.25 }} />
                 {ORDER.map((s) => (
-                  <Line key={s} dataKey={s} type="monotone" stroke={COLORS[s]} strokeWidth={s === 'ours' ? 3.2 : 2} dot={false} animationDuration={900} />
+                  <Line key={s} dataKey={s} type="monotone" stroke={COLORS[s]} strokeWidth={s === 'ours' ? 3.2 : 2} dot={false} animationDuration={500} animationEasing="ease-out" />
                 ))}
               </LineChart>
             </ResponsiveContainer>
@@ -91,7 +99,8 @@ function CompareView({ seed }) {
         })}
       </div>
       <p className="glass honest"><span className="ms" aria-hidden="true">info</span>
-        Measured on this seed. Where a baseline wins a metric, it is marked best.</p>
+        Measured on this seed. Where a baseline wins a metric, it is marked best.
+        {onExplain && <button className="btn text sm" onClick={onExplain}>How these are computed</button>}</p>
     </div>
   )
 }

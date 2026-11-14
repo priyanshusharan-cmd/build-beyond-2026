@@ -7,35 +7,50 @@ import Chat from './components/Chat.jsx'
 import Charts, { hover } from './components/Charts.jsx'
 import { Avatar } from './components/Avatars.jsx'
 import { ChaosSheet, RunSheet } from './components/Sheets.jsx'
+import MethodDialog from './components/Method.jsx'
+
 
 const CompareView = lazy(() => import('./components/CompareView.jsx'))
 const SPEEDS = [1, 4, 16, 60]
 
-function Tiles({ row, metrics }) {
+function Tiles({ row, metrics, onExplain }) {
+  const kpis = [
+    ['Damage', fmt(row?.damage_cum ?? 0), ''],
+    ['Fairness', fmt(row?.jain, 2), ''],
+    ['Cascades', row?.cascadesCum ?? 0, ''],
+    ...(metrics ? [['Breaches', metrics.violations, metrics.violations ? 'bad' : 'good']] : []),
+  ]
   return (
-    <div className="tiles">
-      {AGENTS.map((a) => {
-        const s = row?.served_pct?.[a] ?? 1
-        const st = statusOf(row, a)
-        const extra = a === 'water' ? `Reservoir ${pct(row?.reservoir)}` : a === 'telecom' ? `Battery ${pct(row?.battery)}` : `${Math.round(s * 100)}% met`
-        return (
-          <article key={a} className="tile">
-            <Avatar who={a} size={24} />
-            <div className="tile-body">
-              <div className="tile-top"><b>{AGENT_META[a].label}</b><span className={`st ${st}`}>{STATUS_TEXT[st]}</span></div>
-              <div className="tile-mw num">{fmt(row?.grants?.[a])} / {fmt(row?.need?.[a], 0)} MW · {extra}</div>
-              <div className="meter"><i style={{ width: `${s * 100}%`, background: AGENT_META[a].hex }} /></div>
-            </div>
-          </article>
-        )
-      })}
-      <article className="tile kpi">
-        <div><span>Damage</span><b className="num">{fmt(row?.damage_cum ?? 0)}</b></div>
-        <div><span>Fairness</span><b className="num">{fmt(row?.jain, 2)}</b></div>
-        <div><span>Cascades</span><b className="num">{row?.cascadesCum ?? 0}</b></div>
-        {metrics && <div><span>Breaches</span><b className={`num ${metrics.violations ? 'bad' : 'good'}`}>{metrics.violations}</b></div>}
-      </article>
-    </div>
+    <>
+      <div className="tiles">
+        {AGENTS.map((a) => {
+          const s = row?.served_pct?.[a] ?? 1
+          const st = statusOf(row, a)
+          const extra = a === 'water' ? `Reservoir ${pct(row?.reservoir)}` : a === 'telecom' ? `Battery ${pct(row?.battery)}` : `${Math.round(s * 100)}% met`
+          return (
+            <article key={a} className="tile">
+              <div className="tile-top">
+                <Avatar who={a} size={22} />
+                <b>{AGENT_META[a].label}</b>
+              </div>
+              <div className="tile-mw"><span className="num big">{fmt(row?.grants?.[a])}</span><span className="num of">/ {fmt(row?.need?.[a], 0)} MW</span></div>
+              <div className="meter"><i style={{ width: `${s * 100}%`, background: AGENT_META[a].color }} /></div>
+              <div className="tile-note"><span>{extra}</span><span className={`st ${st}`} title={STATUS_TEXT[st]}>{STATUS_TEXT[st]}</span></div>
+            </article>
+          )
+        })}
+      </div>
+      <div className="kpis">
+        {kpis.map(([label, value, tone]) => (
+          <div key={label} className="kpi-cell">
+            <span>{label}</span><b className={`num ${tone}`}>{value}</b>
+          </div>
+        ))}
+        <button className="btn icon kpi-help" onClick={onExplain} aria-label="How damage and fairness are computed" title="How damage and fairness are computed">
+          <span className="ms" aria-hidden="true">function</span>
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -205,7 +220,7 @@ export default function App() {
                 <div className="hero-text"><b>{shown ? `${fmt(shown.supply, 0)} MW on the grid` : 'Waiting for power'}</b>
                   <span>{shown ? `${fmt(shown.needTotal, 0)} MW needed · ${STRATEGIES[strategy].label.toLowerCase()} at minute ${shown.t}` : 'Start a run to light up the city'}</span></div>
               </div>
-              <Tiles row={shown} metrics={run.metrics} />
+              <Tiles row={shown} metrics={run.metrics} onExplain={() => setSheet('method')} />
               <Charts rows={rows} shocks={run.info?.shocks ?? []} focus={focus} onPick={pick} theme={theme} />
             </section>
             <Chat rows={rows} strategy={strategy} speed={speed} focus={focus} scrollTo={scrollTo} onHover={hover.set} onPick={pickFromChat} />
@@ -215,7 +230,7 @@ export default function App() {
       ) : (
         <main className="compare-wrap scroll">
           <Suspense fallback={<div className="panel"><div className="skeleton" /></div>}>
-            <CompareView seed={run.info?.seed ?? cfg.seed} />
+            <CompareView seed={run.info?.seed ?? cfg.seed} theme={theme} onExplain={() => setSheet('method')} />
           </Suspense>
         </main>
       )}
@@ -225,13 +240,14 @@ export default function App() {
           <div className="cd-card">
             <span className="cd-label"><span className="ms" aria-hidden="true">{countdown.icon ?? 'bolt'}</span>{countdown.label}</span>
             {countdown.impact
-              ? <><b className="cd-impact">IMPACT</b><span className="cd-sub num">{countdown.at} · lasts {countdown.dur} min · watch the agents renegotiate</span></>
+              ? <><b className="cd-impact">Injected</b><span className="cd-sub num">{countdown.at} · lasts {countdown.dur} min · the agents renegotiate from here</span></>
               : <><div className="cd-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" className="cd-track" /><circle key={countdown.n} cx="60" cy="60" r="54" className="cd-prog" /></svg>
                   <b key={`n${countdown.n}`} className="cd-num num">{countdown.n}</b></div>
-                <span className="cd-sub">Striking the city in…</span></>}
+                <span className="cd-sub">Hitting the grid in…</span></>}
           </div>
         </div>
       )}
+      {sheet === 'method' && <MethodDialog onClose={closeSheet} />}
       {sheet === 'run' && <RunSheet initial={{ strategy, seed: run.info?.seed ?? cfg.seed }} onStart={start} onClose={closeSheet} />}
       {sheet === 'chaos' && <ChaosSheet onInject={strike} onClose={closeSheet} disabled={!run.info || done} />}
     </div>
