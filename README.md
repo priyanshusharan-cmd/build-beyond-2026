@@ -36,7 +36,7 @@ Build Beyond '26 · Problem Statement 1.1 · Team ScaredToCompile
 
 ## 🎬 Demo video
 
-<!-- DEMO VIDEO: edit this file on GitHub, delete this comment line and drag & drop the .mp4 here -->
+https://github.com/user-attachments/assets/a608566b-0f49-4953-8274-01412c1d31df
 
 **Live app:** https://blackout-arena-s8pe.onrender.com <sub>(free tier: the first load can take ~50 s while it wakes up)</sub>
 
