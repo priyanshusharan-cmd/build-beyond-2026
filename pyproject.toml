@@ -7,7 +7,8 @@ dependencies = [
   "numpy",
   "pyyaml",
   "fastapi",
-  "uvicorn",
+  "uvicorn[standard]",
+  "httpx",
   "pytest",
   "hypothesis",
 ]

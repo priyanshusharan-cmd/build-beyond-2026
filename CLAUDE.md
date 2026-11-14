@@ -82,6 +82,7 @@ Types: SUPPLY_UPDATE, CHAOS_INJECTED, PRICE_BROADCAST, BID, OFFER, COUNTER, CONC
 - `POST /runs/{id}/chaos` {kind: kill_substation|icu_surge|burst_main, params}
 - `GET /compare?scenario=&seed=` -> metrics for all strategies on the same seed
 - `GET /health`
+- Additive (Phase 2): `GET /runs/{id}` (info + snapshot + metrics when done), `POST /runs/{id}/control` {speed?, paused?}. WS frames: `{events, snapshot, done, metrics?}`.
 
 ## 8. Repo layout
 ```
