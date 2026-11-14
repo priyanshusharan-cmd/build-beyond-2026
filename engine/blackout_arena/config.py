@@ -45,7 +45,19 @@ class MarketConfig(BaseModel):
     p_min: float
 
 
+class Layer2Config(BaseModel):
+    rounds: int = 3              # max bilateral bargaining rounds per tick
+    chunks_mw: list[float] = [0.5, 1.0, 2.0, 4.0]  # concession sizes offered
+    duration_ticks: int = 5      # T: how long an accepted concession is honoured
+    min_gain: float = 0.05       # weighted damage reduction needed to bother offering
+    credit_scale: float = 30.0   # credit = mw * T / credit_scale
+    debt_floor: float = -1.0     # a debtor refuses (counters) concessions that push it below this
+    credit_cap: float = 1.0      # banked credit is capped
+    debt_penalizes: bool = False  # if False, only positive credit raises bid weight
+
+
 class DamageConfig(BaseModel):
+    layer2: Layer2Config = Layer2Config()
     weights: dict[str, float]
     critical_floor_frac: dict[str, float]
     priority_order: list[str]

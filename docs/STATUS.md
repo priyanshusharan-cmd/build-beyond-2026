@@ -88,6 +88,37 @@ mirrors into a store; App has two views (Live | Compare). Engine and API untouch
 - Verified in the browser: light + dark, 1440x900 and 375x812, Live + Compare, method dialog, chaos
   countdown and impact. `npm run build` passes (bundle down to 118 kB app + 560 kB recharts).
 
+## Phase 3 + Nice tier (Layer 2, credit, ablations, explanations, report) — DONE (engine), UI not yet wired
+- Layer 2 (`sim._layer2`): after Layer 1 settles, agents bargain bilaterally up to `layer2.rounds` (3). Best
+  (yielder, beneficiary, x MW) by net weighted-damage gain is OFFERed for T=5 min; beneficiary accepts, COUNTERs
+  (halved x, only if `debt_penalizes`) or rejects. Transfers conserve power and respect caps; the result still goes
+  through ledger propose -> validate -> commit; on fallback the tick's concessions are void and no credit is booked.
+  Accepted concessions persist T ticks (replayed while still net-beneficial). Params in config/damage.yaml `layer2:`.
+- Credit: yielder banks x*T/credit_scale, beneficiary owes it (CREDIT_UPDATE events), clamped to [debt_floor, credit_cap],
+  decays 2%/tick. Positive credit raises bid weight (w_eff = w*(1+lambda*credit)). Debts are tracked/reported but do NOT
+  lower bid weight (`debt_penalizes: false`): first version let debt starve the hospital and cost +60% damage (308 vs 191).
+- Ablation strategies `ours_no_l2`, `ours_no_credit` (baselines.ABLATIONS; not in default /compare).
+  `python scripts/run_benchmark.py --ablations`.
+- EXPLANATION events: deterministic templates (chaos, concession, fallback, cascade, status change). No LLM, never
+  read by agents.
+- `python scripts/export_report.py` -> docs/RESULTS.md from results.json.
+- Tests: 132 passing (9 new in tests/test_layer2.py). Fuzz 1000 runs, 0 violations, 0 fallbacks.
+
+## Benchmark with Layer 2 (20 seeds, default_8h, damage = modeled proxy)
+- ours 179.7±46.4, 0 viol, jain 0.991, 4.10 cascades
+- ours_no_l2 190.9±70.6, jain 0.990, 2.65 cascades; ours_no_credit 178.8±47.7, jain 0.991, 4.20 cascades
+- priority 194.0±58.6, jain 0.984, 3.45 cascades; proportional 787±153; blind 3368 with 414 violations
+- HONEST: Layer 2 lowers damage ~6% vs no Layer 2 and ours beats static priority on 11/20 seeds (mean -14.4), still
+  within one std: not a clean win. Layer 2 RAISES cascades (4.10 vs 2.65 without it; priority 3.45). Credit has
+  no measurable effect on damage or Jain here (179.7 vs 178.8, 0.991 vs 0.991): present as a fairness mechanism
+  that is cost-free, not as a proven improvement.
+
+## UI wiring for Layer 2 — DONE, verified in browser
+- useRun.js folds CONCESSION (non-replay) and COUNTER into `thread.deals`; story.js turns each into a chat line from the
+  yielder (chips "Yields x MW", "+credit"; counter/reject lines). App.jsx tiles show `credit ±x` once |credit| >= 0.01.
+- Fixed a pre-existing build break: Sheets.jsx still imported the removed `gsap`; now uses the Web Animations API.
+- Gotcha: vite proxies /api -> 8010 (env API_PORT overrides). If a stale API holds 8010 the UI shows no deals.
+
 ## Next
-1. Layer 2 concessions + credit/fairness (credits still stay 0 everywhere)
-2. Nice: ablations (ours without Layer 2, ours without credit), plain-English explanations
+- Add ablations to the Compare view (API /compare currently returns only the 4 default strategies).
+- Investigate why Layer 2 raises cascades (likely it drains the water reservoir / telecom battery for a short-term gain).

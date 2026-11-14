@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import statistics
 
-from .baselines import STRATEGIES
+from .baselines import ABLATIONS, STRATEGIES
 from .config import Scenario
 from .fairness import jain_from_runs
 from .models import AGENTS
@@ -30,10 +30,15 @@ def compare(scenario: Scenario, params: dict, seed: int) -> dict[str, dict]:
     return {s: compute_metrics(run_simulation(scenario, params, seed, s)) for s in STRATEGIES}
 
 
+def compare_with_ablations(scenario: Scenario, params: dict, seed: int) -> dict[str, dict]:
+    """All strategies plus our two ablations (no Layer 2, no credit) on the same seed."""
+    return {s: compute_metrics(run_simulation(scenario, params, seed, s)) for s in STRATEGIES + ABLATIONS}
+
+
 def aggregate(per_seed: list[dict[str, dict]]) -> dict[str, dict]:
     """mean +- std over seeds for each strategy and scalar metric."""
     out: dict[str, dict] = {}
-    for s in STRATEGIES:
+    for s in [k for k in per_seed[0] if k in STRATEGIES + ABLATIONS]:
         rows = [m[s] for m in per_seed]
         out[s] = {}
         for k in ("total_damage", "violations", "jain", "cascades", "fallback_ticks"):

@@ -26,7 +26,9 @@ function Tiles({ row, metrics, onExplain }) {
         {AGENTS.map((a) => {
           const s = row?.served_pct?.[a] ?? 1
           const st = statusOf(row, a)
-          const extra = a === 'water' ? `Reservoir ${pct(row?.reservoir)}` : a === 'telecom' ? `Battery ${pct(row?.battery)}` : `${Math.round(s * 100)}% met`
+          const cr = row?.credits?.[a] ?? 0
+          const base = a === 'water' ? `Reservoir ${pct(row?.reservoir)}` : a === 'telecom' ? `Battery ${pct(row?.battery)}` : `${Math.round(s * 100)}% met`
+          const extra = Math.abs(cr) >= 0.01 ? `${base} · credit ${cr > 0 ? '+' : ''}${fmt(cr, 2)}` : base
           return (
             <article key={a} className="tile">
               <div className="tile-top">

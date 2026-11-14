@@ -7,7 +7,7 @@ import { AGENTS, api, wsUrl } from './lib.js'
  * outcome, chaos, cascades). State is flushed at most once per animation frame.
  */
 function emptyThread(tick) {
-  return { tick, rounds: [], bids: Object.fromEntries(AGENTS.map((a) => [a, []])), ledger: [], chaos: [], cascades: [], supplyInfo: null, damage: null }
+  return { tick, rounds: [], bids: Object.fromEntries(AGENTS.map((a) => [a, []])), ledger: [], chaos: [], cascades: [], deals: [], supplyInfo: null, damage: null }
 }
 
 export function useRun() {
@@ -44,6 +44,8 @@ export function useRun() {
         case 'BID': th.bids[e.agent]?.push(e.payload.demand_mw); break
         case 'PROPOSE': case 'VALIDATED': case 'REJECTED': case 'COMMIT': case 'FALLBACK':
           th.ledger.push({ type: e.type, ...e.payload }); break
+        case 'CONCESSION': if (!e.payload.replay) th.deals.push({ type: 'deal', from: e.agent, ...e.payload }); break
+        case 'COUNTER': th.deals.push({ type: 'counter', from: e.agent, ...e.payload }); break
         case 'DAMAGE_TICK': th.damage = e.payload.damage; break
         case 'CASCADE_TRIGGERED': th.cascades.push(e.payload.cascade); break
         case 'TICK_SUMMARY': {

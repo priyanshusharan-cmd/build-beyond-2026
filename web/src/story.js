@@ -9,6 +9,7 @@ import { AGENTS, CASCADE_TEXT, chaosText, fmt, statusOf } from './lib.js'
 const BUF_LEVELS = [0.5, 0.25, 0.1]
 const pc = (x) => `${Math.round(x * 100)}%`
 const chip = (kind, label) => ({ kind, label })
+const AGENT_LABEL = (a) => a.charAt(0).toUpperCase() + a.slice(1)
 
 function agentLine(a, r, why) {
   const g = r.grants[a], need = r.need[a], short = Math.max(0, need - g), s = r.served_pct[a]
@@ -84,6 +85,18 @@ export function buildStory(rows, { strategy = 'ours', summaryOnly = false } = {}
       })
     } else {
       AGENTS.forEach((a) => { if (statusOf(r, a) !== last.status[a]) { add(agentLine(a, r)); spoke.push(a) } })
+    }
+    for (const d of th.deals ?? []) {
+      const label = (x) => AGENT_LABEL(x)
+      if (d.type === 'counter') {
+        add({ who: d.from, text: d.action === 'reject'
+          ? `${label(d.to)}, I'm already owing too much. No deal.`
+          : `${label(d.to)}, I'll take ${fmt(d.mw)} MW, not more. I owe a lot already.`, chips: [chip('wait', 'Counter')] })
+      } else {
+        add({ who: d.from, text: `${label(d.to)}, you need this more than I do. Taking ${fmt(d.mw)} MW off my share for ${d.minutes} min.`,
+          chips: [chip('yield', `Yields ${fmt(d.mw)} MW`), ...(d.credit ? [chip('wait', `+${fmt(d.credit, 2)} credit`)] : [])] })
+        spoke.push(d.from)
+      }
     }
     for (const c of th.cascades) {
       const t = CASCADE_TEXT[c] ?? { title: `Cascade ${c}`, body: '' }

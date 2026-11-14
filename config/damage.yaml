@@ -42,6 +42,16 @@ fairness:
   lambda_credit: 0.5
   credit_decay: 0.02
 
+layer2:
+  rounds: 3
+  chunks_mw: [0.5, 1.0, 2.0, 4.0]
+  duration_ticks: 5
+  min_gain: 0.05
+  credit_scale: 30.0
+  debt_floor: -1.0
+  credit_cap: 1.0
+  debt_penalizes: false
+
 market:
   p0: 1.0
   eta: 0.5

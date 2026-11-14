@@ -14,7 +14,7 @@ from . import baselines
 from .agents.system import AgentSystem
 from .config import Scenario
 from .events import EventLog
-from .fairness import decay_credit, effective_weight, jain_from_runs
+from .fairness import apply_concession, decay_credit, effective_weight, jain_from_runs
 from .invariants import Violation, check_event_order, check_tick
 from .ledger import Ledger, fallback_split
 from .market import MarketClock
@@ -64,7 +64,7 @@ class Simulation:
         strategy: str = "ours",
         chaos_schedule: list[tuple[int, str, dict]] | None = None,
     ):
-        if strategy not in baselines.STRATEGIES:
+        if strategy not in baselines.STRATEGIES and strategy not in baselines.ABLATIONS:
             raise ValueError(f"unknown strategy {strategy}")
         self.sc = scenario
         self.params = params
@@ -77,6 +77,13 @@ class Simulation:
         m = params["market"]
         self.market = MarketClock(m["p0"], m["eta"], m["damping"], m["eps"], int(m["max_rounds"]), m["p_min"])
         self.credits = {a: 0.0 for a in AGENTS}
+        self.is_ours = strategy in baselines.OURS_FAMILY
+        self.use_l2 = strategy in ("ours", "ours_no_credit")   # Layer 2 bilateral bargaining
+        self.use_credit = strategy == "ours"                    # credit banking + credit-weighted bids
+        self.l2cfg = params.get("layer2", {})
+        self._concessions: list[dict] = []   # accepted, still-honoured concessions
+        self._notes: list[tuple[str, str]] = []  # (kind, plain-English text) for this tick
+        self._prev_status: dict = {}
         self.tick = 0
         self.base_supply = float(scenario.nominal_supply)
         self.damage_cum = 0.0
@@ -111,6 +118,7 @@ class Simulation:
         else:
             raise ValueError(f"unknown chaos kind {kind}")
         self.log.append(t, EventType.CHAOS_INJECTED, None, {"kind": kind, "params": p, "source": "live"})
+        self._notes.append(("chaos", f"Chaos injected: {kind.replace('_', ' ')} for {dur} min."))
 
     # ----------------------------------------------------------------- supply
     def _supply(self) -> tuple[float, dict]:
@@ -141,6 +149,7 @@ class Simulation:
                 self.log.append(t, EventType.CHAOS_INJECTED, None,
                                 {"kind": "scenario_shock", "label": s.label, "delta_mw": s.delta_mw,
                                  "duration": s.duration, "source": "scenario"})
+                self._notes.append(("chaos", f"Scenario event: {s.label} ({s.delta_mw:+.0f} MW for {s.duration} min)."))
         while self._chaos_queue and self._chaos_queue[0][0] <= t:
             _, kind, p = self._chaos_queue.pop(0)
             self._apply_chaos(kind, p)
@@ -152,7 +161,7 @@ class Simulation:
         caps = {a: min(needs[a], self.sc.max_draw[a]) for a in AGENTS}
 
         price, rounds, used_fb, nviol = self.market.price, 0, False, 0
-        if self.strategy == "ours":
+        if self.is_ours:
             grants, price, rounds, used_fb = self._negotiate(t, supply, caps)
         else:
             grants, nviol = self._baseline(t, supply, caps)
@@ -179,6 +188,9 @@ class Simulation:
             self.log.append(t, EventType.CASCADE_TRIGGERED, None, {"cascade": c})
         if used_fb:
             self.result.fallback_ticks += 1
+        if self.is_ours:
+            self._explain(t, supply, used_fb, res)
+        self._notes = []
         self.log.append(t, EventType.TICK_SUMMARY, None, {
             "supply": supply, "grants": committed, "served_pct": served_pct,
             "damage_tick": res.total, "damage_cum": self.damage_cum,
@@ -197,7 +209,10 @@ class Simulation:
         lam = self.params["fairness"]["lambda_credit"]
 
         def bid_fn(name: str, p: float) -> float:
-            mult = effective_weight(1.0, self.credits[name], lam)
+            c = self.credits[name]
+            if not self.l2cfg.get("debt_penalizes", False):
+                c = max(0.0, c)  # debts are tracked and reported, but never starve a critical load
+            mult = effective_weight(1.0, c, lam) if self.use_credit else 1.0
             return self.system.bid(name, p, mult)
 
         pr = self.market.discover(supply, list(AGENTS), bid_fn)
@@ -221,12 +236,18 @@ class Simulation:
         if best is not None:
             proposal = {a: min(best["demands"][a], caps[a]) for a in AGENTS}
         used_fb = False
+        accepted: list[dict] = []
         if proposal is not None:
+            if self.use_l2:
+                proposal, accepted = self._layer2(t, supply, proposal, caps)
             res = self.ledger.submit(t, supply, proposal)
             self._emit(t, res.events)
             if res.committed:
+                self._book_credits(t, accepted)
                 return self.ledger.grants, self.market.price, rounds_used, False
-        # negotiation failed to settle or ledger rejected: deterministic fallback
+        # negotiation failed to settle or ledger rejected: deterministic fallback.
+        # Concessions struck this tick were never committed, so they are void (no credit booked).
+        self._concessions = [c for c in self._concessions if c not in accepted]
         used_fb = True
         floors = {a: self.system.critical_floor(a) for a in AGENTS}
         fb = fallback_split(supply, self.system.weights(), floors, caps, self.system.names)
@@ -234,6 +255,120 @@ class Simulation:
         self._emit(t, res.events)
         grants = self.ledger.grants if res.committed else {a: 0.0 for a in AGENTS}
         return grants, self.market.price, rounds_used, used_fb
+
+    # ------------------------------------------------------- layer 2 bargaining
+    def _layer2(self, t: int, supply: float, proposal: dict, caps: dict):
+        """Fine bilateral bargaining on top of the Layer 1 settlement.
+
+        Each agent values MW with its own damage function. A low-marginal-damage agent (the
+        yielder) offers x MW for T minutes to a high-marginal-damage agent; the counterparty
+        accepts, counters (smaller x when the credit it would owe breaches its debt floor) or
+        rejects. Transfers conserve total power and respect each agent's cap, and the result
+        still goes through ledger propose -> validate -> commit. Returns (proposal, accepted).
+        """
+        cfg = self.l2cfg
+        ag = self.system.agents
+        names = self.system.names
+        prop = dict(proposal)
+        accepted: list[dict] = []
+
+        def gain(a: str, q: float, x: float) -> float:
+            return ag[a].weight * (ag[a].valuation(q) - ag[a].valuation(q + x))
+
+        def loss(a: str, q: float, x: float) -> float:
+            return ag[a].weight * (ag[a].valuation(q - x) - ag[a].valuation(q))
+
+        # honour still-running concessions while they remain worthwhile
+        keep = []
+        for c in self._concessions:
+            if c["until"] <= t:
+                continue
+            y, b = c["y"], c["b"]
+            x = min(c["mw"], prop[y], caps[b] - prop[b])
+            if x > 1e-9 and gain(b, prop[b], x) - loss(y, prop[y], x) > 0:
+                prop[y] -= x
+                prop[b] += x
+                self.log.append(t, EventType.CONCESSION, y, {"to": b, "mw": x, "until": c["until"], "replay": True})
+                keep.append(c)
+        self._concessions = keep
+
+        T = int(cfg.get("duration_ticks", 5))
+        chunks = list(cfg.get("chunks_mw", [0.5, 1.0, 2.0, 4.0]))
+        min_gain = float(cfg.get("min_gain", 0.05))
+        scale = float(cfg.get("credit_scale", 30.0))
+        floor = float(cfg.get("debt_floor", -1.0))
+        for rnd in range(1, int(cfg.get("rounds", 3)) + 1):
+            best = None
+            for y in names:
+                for b in names:
+                    if y == b:
+                        continue
+                    for x in chunks:
+                        if x > prop[y] + 1e-9 or prop[b] + x > caps[b] + 1e-9:
+                            continue
+                        net = gain(b, prop[b], x) - loss(y, prop[y], x)
+                        if best is None or net > best[0] + 1e-12:
+                            best = (net, y, b, x)
+            if best is None or best[0] < min_gain:
+                break
+            net, y, b, x = best
+            award = x * T / scale
+            self.log.append(t, EventType.OFFER, y, {"to": b, "mw": x, "minutes": T, "credit": award,
+                                                    "net_gain": net, "round": rnd})
+            if self.use_credit and cfg.get("debt_penalizes", False) and self.credits[b] - award < floor:
+                x2 = x / 2.0
+                net2 = gain(b, prop[b], x2) - loss(y, prop[y], x2) if x2 <= prop[y] else -1.0
+                if net2 < min_gain:
+                    self.log.append(t, EventType.COUNTER, b, {"to": y, "action": "reject",
+                                                              "reason": "debt_floor", "round": rnd})
+                    break
+                self.log.append(t, EventType.COUNTER, b, {"to": y, "action": "counter", "mw": x2,
+                                                          "reason": "debt_floor", "round": rnd})
+                x, net, award = x2, net2, x2 * T / scale
+            prop[y] -= x
+            prop[b] += x
+            c = {"y": y, "b": b, "mw": x, "until": t + T, "credit": award}
+            self._concessions.append(c)
+            accepted.append(c)
+            self.log.append(t, EventType.CONCESSION, y, {"to": b, "mw": x, "minutes": T, "credit": award,
+                                                         "net_gain": net, "round": rnd})
+            self._notes.append(("concession", f"{y.capitalize()} yields {x:g} MW to {b.capitalize()} "
+                                f"for {T} min: {b.capitalize()} gains more from it than {y.capitalize()} loses."))
+        return prop, accepted
+
+    def _book_credits(self, t: int, accepted: list[dict]) -> None:
+        """After a successful commit, the yielder banks credit and the beneficiary owes it."""
+        if not self.use_credit or not accepted:
+            return
+        cfg = self.l2cfg
+        lo, hi = float(cfg.get("debt_floor", -1.0)), float(cfg.get("credit_cap", 3.0))
+        for c in accepted:
+            new = apply_concession(self.credits, c["y"], c["b"], c["credit"])
+            for a in (c["y"], c["b"]):
+                new[a] = min(hi, max(lo, new[a]))
+            self.credits = new
+            for a in (c["y"], c["b"]):
+                self.log.append(t, EventType.CREDIT_UPDATE, a,
+                                {"credit": self.credits[a], "delta": c["credit"] if a == c["y"] else -c["credit"],
+                                 "with": c["b"] if a == c["y"] else c["y"]})
+
+    # ----------------------------------------------------------- explanations
+    def _explain(self, t: int, supply: float, used_fb: bool, res) -> None:
+        """Deterministic plain-English explanation events (templates, no LLM, never read by agents)."""
+        notes = list(self._notes)
+        if used_fb:
+            notes.append(("fallback", "Negotiation did not settle safely, so the deterministic fallback split was applied."))
+        for c in res.cascades:
+            what = ("Water pressure is low: hospital cooling load rises 20%." if c == "A"
+                    else "Telecom battery is empty: emergency response is less effective.")
+            notes.append(("cascade", what))
+        for a, s in res.status.items():
+            prev = self._prev_status.get(a)
+            if prev is not None and prev != s:
+                notes.append(("status", f"{a.capitalize()} went from {prev} to {s}."))
+        self._prev_status = dict(res.status)
+        for kind, text in notes:
+            self.log.append(t, EventType.EXPLANATION, None, {"kind": kind, "text": text})
 
     def _clear_price(self, t: int, supply: float, bid_fn, best, pr):
         """Bisection price clearing (max 20 extra rounds). Returns (best_round, rounds_used)."""
@@ -331,7 +466,7 @@ class Simulation:
     def run(self) -> RunResult:
         while self.tick < self.sc.ticks:
             self.step()
-        if self.strategy == "ours":
+        if self.is_ours:
             evs = [self.log.event_dict(e) for e in self.log.events]
             self.result.violations += check_event_order(evs)
         return self.result

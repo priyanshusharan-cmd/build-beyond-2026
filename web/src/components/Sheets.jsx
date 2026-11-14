@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
 import { STRATEGIES, hhmm, prefersReducedMotion } from '../lib.js'
 
 function Sheet({ title, sub, onClose, children }) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
-    if (!prefersReducedMotion()) gsap.fromTo(el, { scale: 0.97, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.24, ease: 'expo.out' })
+    if (!prefersReducedMotion()) el.animate([{ transform: 'scale(0.97)', opacity: 0.4 }, { transform: 'scale(1)', opacity: 1 }], { duration: 240, easing: 'cubic-bezier(0.05, 0.7, 0.1, 1)' })
     el.querySelector('button, input')?.focus()
     const key = (e) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', key)

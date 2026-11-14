@@ -6,6 +6,9 @@ from __future__ import annotations
 
 PRIORITY_ORDER = ["hospital", "emergency", "telecom", "water"]
 STRATEGIES = ("ours", "blind", "proportional", "priority")
+# Ablations of our system (same engine, features switched off). Not part of the default compare.
+ABLATIONS = ("ours_no_l2", "ours_no_credit")
+OURS_FAMILY = ("ours",) + ABLATIONS
 
 
 def blind_request(caps: dict[str, float]) -> dict[str, float]:
