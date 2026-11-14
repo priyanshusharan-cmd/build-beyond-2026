@@ -232,3 +232,21 @@ async def compare(scenario: str = "default_8h", seed: int = 0) -> dict:
     scenario_path(scenario)
     metrics = await run_in_threadpool(_compare_cached, scenario, seed)
     return {"scenario": scenario, "seed": seed, "damage_note": "modeled proxy", "strategies": metrics}
+
+
+# --- production (e.g. Render): one service serves the built dashboard and the API under /api ---
+from fastapi.staticfiles import StaticFiles  # noqa: E402
+from starlette.types import Receive, Scope, Send  # noqa: E402
+
+_DIST = ROOT / "web" / "dist"
+if _DIST.exists():
+    app.mount("/", StaticFiles(directory=_DIST, html=True), name="web")
+
+_api = app
+
+
+async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: F811
+    """Strip a leading /api so the dashboard's /api/... calls (HTTP and WebSocket) reach the routes."""
+    if scope["type"] in ("http", "websocket") and scope["path"].startswith("/api/"):
+        scope = dict(scope, path=scope["path"][4:], raw_path=scope["path"][4:].encode())
+    await _api(scope, receive, send)
